@@ -4,6 +4,13 @@ function Ship()
   this.mass = 100;
   this.size = 50;
 
+  // shape
+  this.vertex = [
+    createVector(0, -this.size),
+    createVector(+this.size/2, +this.size/2),
+    createVector(-this.size/2, +this.size/2)
+  ];
+
   // Position, Orientation and Velocity
   this.pos = createVector(width/2, height/2);
   this.heading = -90;
@@ -25,10 +32,15 @@ function Ship()
   this.shield = 100;
   this.shield_refill = 0.05;
   this.shield_gauge = new Gauge("Shields", 100, height-100, 80, 0, 100);
+  this.shieldBlink = 0;
 
   // Weapons
   this.weapon = 0;
-  this.weapons = [new Laser(), new ProtonGun()];
+  this.weapons = [
+    new Laser(),
+    new ProtonGun(),
+    new PlasmaBomb()
+  ];
 }
 
 Ship.prototype =
@@ -137,15 +149,49 @@ Ship.prototype =
     push();
 
     fill(0);
-    if (this.isHit) stroke(255, 0, 0); else stroke(255);
-    this.isHit = false;
+    stroke(255);
+
+    if (this.isHit)
+    {
+      this.shieldBlink++;
+      if (this.shieldBlink > 10) this.shieldBlink = 0;
+
+      if (this.shieldBlink > 5)
+        stroke(255, 0, 0);
+
+      this.isHit = false;
+    }
+
+    if (this.shield < 20)
+    {
+      this.shieldBlink++;
+      if (this.shieldBlink > this.shield) this.shieldBlink = 0;
+
+      if (this.shieldBlink > this.shield / 2)
+        strokeWeight(2);
+      else
+        strokeWeight(1);
+    }
 
     translate(this.pos.x, this.pos.y);
     rotate((this.heading + 90) * PI / 180);
 
-    triangle(-this.size/2,this.size/2,
-             this.size/2, this.size/2,
-             0, -this.size/1.25);
+    beginShape();
+    for (v = 0; v < this.vertex.length; ++v)
+        vertex(this.vertex[v].x, this.vertex[v].y);
+    endShape(CLOSE);
+
+    // Render Thruster
+    var s = this.acc.mag();
+    strokeWeight(1);
+
+    for (var i = 1; i < 5; ++i)
+    {
+      var x = -this.size/2 + i * this.size / 5;
+
+      line(x, this.size/2,
+           x, this.size/2 + s * random(10, 20));
+    }
 
     // Render Weapons on top of Ship
     for (var i = 0; i < this.weapons.length; ++i)

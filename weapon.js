@@ -1,7 +1,5 @@
 function Weapon(name, maxcharge, charge, refill, shape,
-                projectile_power, projectile_speed,
-                projectile_inertia, projectile_hitAniFrames,
-                projectile_ttl, projectile_shape)
+                projectile_speed, projectile_inertia, projectile)
 {
   this.name = name;
 
@@ -12,12 +10,9 @@ function Weapon(name, maxcharge, charge, refill, shape,
   this.shape = shape;
   this.gauge = new Gauge(name, width-100, height-100, 80, 0, this.maxcharge);
 
-  this.projectile_hitAniFrames = projectile_hitAniFrames;
-  this.projectile_power = projectile_power;
+  this.projectile = projectile;
   this.projectile_speed = projectile_speed;
   this.projectile_inertia = projectile_inertia;
-  this.projectile_shape = projectile_shape;
-  this.projectile_ttl   = projectile_ttl;
 }
 
 Weapon.prototype =
@@ -28,14 +23,9 @@ Weapon.prototype =
     {
       var vel = p5.Vector.fromAngle(h * PI / 180);
       vel = vel.mult(this.projectile_speed);
-
       var v_in = createVector(v.x, v.y).mult(this.projectile_inertia);
 
-      var projectiles = [new Projectile(p, vel.add(v_in), h,
-                         this.projectile_shape,
-                         this.projectile_power,
-                         this.projectile_ttl,
-                         this.projectile_hitAniFrames)];
+      var projectiles = [this.projectile.getCopy(p, vel.add(v_in), h)];
 
       this.charge--;
 

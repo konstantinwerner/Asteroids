@@ -210,10 +210,13 @@ Universe.prototype =
       strokeWeight(3);
 
       textSize(50);
-      text("GAME OVER!", width/2, height/2);
+      text("GAME OVER!", width/2, height/2-50);
+
+      textSize(25);
+      text("Score: " + this.ship.score, width/2, height/2 );
 
       textSize(20);
-      text("Press [r] to try again.", width/2, height/2+50);
+      text("Press [r] to try again.", width/2, height/2 + 50);
       pop();
     } else if (this.state == state.WON)
     {

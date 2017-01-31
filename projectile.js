@@ -1,4 +1,4 @@
-function Projectile(p, v, h, shape, power, ttl, hitframes)
+function Projectile(p, v, h, shape, power, ttl, hitframes, hitAnimation)
 {
   this.shape = shape;
 
@@ -11,23 +11,35 @@ function Projectile(p, v, h, shape, power, ttl, hitframes)
   this.age = 0;
 
   this.hasHit = false;
+  this.hitAnimation = hitAnimation;
   this.hitFrames = hitframes;
   this.hitFrame = 0;
 }
 
 Projectile.prototype =
 {
+  getCopy: function(p, v, h)
+  {
+    return new Projectile(p, v, h,
+                          this.shape,
+                          this.power,
+                          this.ttl,
+                          this.hitFrames,
+                          this.hitAnimation);
+  },
+
   isDecayed: function()
   {
-    return ((this.age >= this.ttl) &&
-            (this.hitFrames == 0 || (this.hitFrame > this.hitFrames)));
+    if (this.hitFrames == 0)
+      return ((this.age > this.ttl) || (this.hasHit));
+    else
+      return ((this.age > this.ttl) || (this.hitFrame > this.hitFrames));
   },
 
   update: function()
   {
     if (this.hasHit)
     {
-        this.age = this.ttl;
         this.hitFrame++;
     } else {
       this.age++;
@@ -58,23 +70,24 @@ Projectile.prototype =
 
       if (this.hasHit)
       {
-        //this.hitAnimation(this.hitFrame);
+        if (this.hitAnimation != undefined)
+          this.hitAnimation(this.hitFrame);
       } else {
         noFill();
         stroke(255 * (1-(this.age / this.ttl)));
         strokeWeight(1);
 
         rotate(this.heading * PI / 180);
-      }
 
-      if (this.shape)
-      {
-        beginShape();
+        if (this.shape)
+        {
+          beginShape();
 
-        for (var i = 0; i < this.shape.length; ++i)
-          vertex(this.shape[i].x, this.shape[i].y);
+          for (var i = 0; i < this.shape.length; ++i)
+            vertex(this.shape[i].x, this.shape[i].y);
 
-        endShape(CLOSE);
+          endShape(CLOSE);
+        }
       }
 
       pop();

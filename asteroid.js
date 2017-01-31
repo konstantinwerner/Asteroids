@@ -3,7 +3,7 @@ function Asteroid(p, v, s)
   this.color = random(200, 255);
 
   this.maxsize = round(min(height, width) / 10);
-  this.minsize = round(this.maxsize / 3);
+  this.minsize = round(this.maxsize / 2);
   this.size = s || random(this.minsize, this.maxsize);
 
   if (v)
@@ -19,20 +19,36 @@ function Asteroid(p, v, s)
   this.angle = random(360);
   this.omega = random(-3, 3);
 
-  this.vertices = round(random(6, 15));
   this.vertex = [];
-
-  for (v = 0; v < this.vertices; ++v)
-    this.vertex.push(random(0.6, 1));
+  this.createShape();
 }
 
 Asteroid.prototype =
 {
+  createShape: function()
+  {
+    var nr = round(random(6, 15));
+
+    for (v = 0; v < nr; ++v)
+    {
+      var r = random(0.6, 1);
+
+      var a = map(v, 0, nr, 0, TWO_PI);
+
+      var x = this.size * r * cos(a);
+      var y = this.size * r * sin(a);
+
+      this.vertex.push(createVector(x, y));
+    }
+  },
+
   isHitBy: function(pos)
   {
+    return collidePointPoly(pos.x - this.pos.x, pos.y - this.pos.y, this.vertex);
+/*
     var d = dist(pos.x, pos.y, this.pos.x, this.pos.y);
-
     return (d < this.size);
+*/
   },
 
   breakup: function(power)
@@ -42,7 +58,7 @@ Asteroid.prototype =
     // If big enough to split up
     if ((this.size / random(0.5, power)) > this.minsize)
     {
-      var maxsplits = 4 - floor(this.maxsize / this.size);
+      var maxsplits = ceil(this.size / this.minsize);
       var splits = ceil(random(2, maxsplits));
       var f = 1.4 * this.size / splits;
       var a_offset = random(0, TWO_PI);
@@ -102,13 +118,8 @@ Asteroid.prototype =
       rotate(this.angle * PI / 180);
 
       beginShape();
-      for (v = 0; v < this.vertices; ++v)
-      {
-          var a = map(v, 0, this.vertices, 0, TWO_PI);
-          var x = this.size * this.vertex[v] * cos(a);
-          var y = this.size * this.vertex[v] * sin(a);
-          vertex(x, y);
-      }
+      for (v = 0; v < this.vertex.length; ++v)
+          vertex(this.vertex[v].x, this.vertex[v].y);
       endShape(CLOSE);
 
       pop();
