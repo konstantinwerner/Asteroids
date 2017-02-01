@@ -1,4 +1,4 @@
-function Projectile(p, v, h, shape, power, ttl, hitframes, hitAnimation)
+function Projectile(p, v, h, shape, power, ttl, flyAnimation, hitAnimation)
 {
   this.shape = shape;
 
@@ -10,30 +10,53 @@ function Projectile(p, v, h, shape, power, ttl, hitframes, hitAnimation)
   this.power = power;
   this.age = 0;
 
-  this.hasHit = false;
+  this.flyAnimation = flyAnimation;
   this.hitAnimation = hitAnimation;
-  this.hitFrames = hitframes;
+
   this.hitFrame = 0;
+  this.hasHit = false;
+  this.hitEnd = false;
 }
 
 Projectile.prototype =
 {
+  defaultHitAnimation: function()
+  {
+    // To be overridden
+    return true;
+  },
+
+  defaultFlyAnimation: function()
+  {
+    // To be overridden
+    noFill();
+    stroke(255 * (1-(this.age / this.ttl)));
+    strokeWeight(1);
+
+    if (this.shape)
+    {
+      beginShape();
+
+      for (var i = 0; i < this.shape.length; ++i)
+        vertex(this.shape[i].x, this.shape[i].y);
+
+      endShape(CLOSE);
+    }
+  },
+
   getCopy: function(p, v, h)
   {
     return new Projectile(p, v, h,
                           this.shape,
                           this.power,
                           this.ttl,
-                          this.hitFrames,
+                          this.flyAnimation,
                           this.hitAnimation);
   },
 
   isDecayed: function()
   {
-    if (this.hitFrames == 0)
-      return ((this.age > this.ttl) || (this.hasHit));
-    else
-      return ((this.age > this.ttl) || (this.hitFrame > this.hitFrames));
+    return ((this.age > this.ttl) || (this.hitEnd));
   },
 
   update: function()
@@ -67,27 +90,19 @@ Projectile.prototype =
       push();
 
       translate(this.pos.x, this.pos.y);
+      rotate(this.heading * PI / 180);
 
       if (this.hasHit)
       {
         if (this.hitAnimation != undefined)
-          this.hitAnimation(this.hitFrame);
+          this.hitEnd = this.hitAnimation(this.hitFrame);
+        else
+          this.hitEnd = this.defaultHitAnimation();
       } else {
-        noFill();
-        stroke(255 * (1-(this.age / this.ttl)));
-        strokeWeight(1);
-
-        rotate(this.heading * PI / 180);
-
-        if (this.shape)
-        {
-          beginShape();
-
-          for (var i = 0; i < this.shape.length; ++i)
-            vertex(this.shape[i].x, this.shape[i].y);
-
-          endShape(CLOSE);
-        }
+        if (this.flyAnimation != undefined)
+          this.flyAnimation();
+        else
+          this.defaultFlyAnimation();
       }
 
       pop();

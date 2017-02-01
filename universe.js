@@ -3,7 +3,7 @@ function Universe()
   // The Players Ship
   this.ship = {};
   // Array of other Objects (PowerUps, Ammo, etc.)
-  this.objects = [];
+  this.powerups = [];
   // Array of Moving Projectiles
   this.projectiles = [];
   // Array of Asteroids
@@ -89,10 +89,11 @@ Universe.prototype =
           if (!this.projectiles[p].hasHit &&
               this.asteroids[a].isHitBy(this.projectiles[p].pos))
           {
+            // Get new Asteroids from the destroyed one
             this.asteroids = this.asteroids.
                             concat(this.asteroids[a].breakup(this.projectiles[p].power));
 
-            // Set has hit to render hit effect
+            // Set hasHit to render hit effect
             this.projectiles[p].hasHit = true;
 
             // Increase Score
@@ -174,7 +175,7 @@ Universe.prototype =
 
       // Show Help Text
       textSize(15);
-      text("[r] New Game    [p] Pause Game    [n] Cycle Weapon    [Space] Fire Weapon",
+      text("[r] New Game    [p] Pause Game    [n] Cycle Weapon    [Arrows] Move Ship    [Space] Fire Weapon",
       width/2, height-20);
 
       pop();

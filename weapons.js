@@ -6,13 +6,24 @@ function LaserProjectile()
     {x: +5, y: 0}
   ];
 
+  var flyAnimation = function()
+  {
+
+  };
+
+  var hitAnimation = function(frame)
+  {
+    
+  };
+
   Projectile.call(this,
                   0, 0, 0,
                   shape,
  /*Power*/        1,
  /*TTL*/          10,
- /*HitFrames*/    0,
- /*HitAnimation*/ undefined);
+                  undefined,
+                  undefined);
+
 }
 LaserProjectile.prototype = Object.create(Projectile.prototype);
 
@@ -26,7 +37,7 @@ function Laser()
   /*Charge*/       100,
   /*Refill*/       0.1,
   /*Shape*/        this.shape,
-  /*Proj.Speed*/   30,
+  /*Proj.Speed*/   35,
   /*Proj.Inertia*/ 0,
                    new LaserProjectile);
 }
@@ -44,6 +55,11 @@ function ProtonGunProjectile()
     {x:  0, y: -5},
   ];
 
+  var flyAnimation = function()
+  {
+
+  };
+
   var hitAnimation = function(frame)
   {
     noFill();
@@ -57,6 +73,7 @@ function ProtonGunProjectile()
       vertex(this.shape[i].x, this.shape[i].y);
     endShape(CLOSE);
 
+    return (frame == 5);
   };
 
   Projectile.call(this,
@@ -64,10 +81,12 @@ function ProtonGunProjectile()
                   shape,
  /*Power*/        3,
  /*TTL*/          40,
- /*HitFrames*/    5,
- /*HitAnimation*/ hitAnimation);
+                  undefined,
+                  hitAnimation);
 }
+
 ProtonGunProjectile.prototype = Object.create(Projectile.prototype);
+
 
 function ProtonGun()
 {
@@ -104,6 +123,11 @@ function PlasmaBombProjectile()
     {x: -10, y: +5},
   ];
 
+  var flyAnimation = function()
+  {
+
+  };
+
   var hitAnimation = function(frame)
   {
     noFill();
@@ -112,6 +136,8 @@ function PlasmaBombProjectile()
     ellipse(0, 0, 8*frame);
     ellipse(0, 0, 2*frame);
     ellipse(0, 0, frame*frame);
+
+    return (frame == 6);
   };
 
   Projectile.call(this,
@@ -119,9 +145,10 @@ function PlasmaBombProjectile()
                   shape,
  /*Power*/        5,
  /*TTL*/          200,
- /*HitFrames*/    10,
- /*HitAnimation*/ hitAnimation);
+                  undefined,
+                  hitAnimation);
 }
+
 PlasmaBombProjectile.prototype = Object.create(Projectile.prototype);
 
 function PlasmaBomb()
