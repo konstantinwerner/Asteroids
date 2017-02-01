@@ -1,5 +1,7 @@
 function Universe()
 {
+  this.version = "v1.5";
+
   // The Players Ship
   this.ship = {};
   // Array of other Objects (PowerUps, Ammo, etc.)
@@ -24,11 +26,13 @@ Universe.prototype =
     this.asteroids = [];
 
     // Adjust number of Asteroids to Screenarea
-    var noOfAsteroids = width * height / 100000;
+    var noOfAsteroids = width * height / 102000;
     for (var a = 0; a < noOfAsteroids; ++a)
       this.asteroids.push(new Asteroid);
 
     this.state = state.PLAYING;
+
+    document.title = "Asteroids " + this.version;
   },
 
   keyPressed: function(key)
@@ -67,12 +71,12 @@ Universe.prototype =
     if (this.state == state.PLAYING)
     {
       this.state = state.PAUSED;
-      document.title = "Asteroids [PAUSED]";
+      document.title = "Asteroids " + this.version + " [PAUSED]";
     }
     else if (this.state == state.PAUSED)
     {
       this.state = state.PLAYING;
-      document.title = "Asteroids";
+      document.title = "Asteroids " + this.version;
     }
   },
 

@@ -100,12 +100,10 @@ Ship.prototype =
   {
     if (this.weapons[this.weapon].auto_rate > 0)  // Automatic Weapon
       this.firing = fire;
-    else
-    {
-      if (fire) // Single Shot Weapon
-      this.projectiles = this.projectiles.
-                         concat(this.weapons[this.weapon].fire(this.pos, this.vel, this.heading));
-    }
+
+    if (fire) // Single Shot Weapon
+    this.projectiles = this.projectiles.
+                       concat(this.weapons[this.weapon].fire(this.pos, this.vel, this.heading));
   },
 
   getProjectiles: function()
