@@ -13,14 +13,14 @@ function LaserProjectile()
 
   var hitAnimation = function(frame)
   {
-    
+
   };
 
   Projectile.call(this,
                   0, 0, 0,
                   shape,
  /*Power*/        1,
- /*TTL*/          38,
+ /*TTL*/          30,
                   undefined,
                   undefined);
 
@@ -33,6 +33,7 @@ function Laser()
 
   Weapon.call(this,
   /*Name*/        "Laser",
+  /*Auto Rate*/    3,
   /*MaxCharge*/    100,
   /*Charge*/       100,
   /*Refill*/       0.1,
@@ -94,6 +95,7 @@ function ProtonGun()
 
   Weapon.call(this,
   /*Name*/        "Proton Gun",
+  /*Auto Rate*/    10,
   /*MaxCharge*/    10,
   /*Charge*/       10,
   /*Refill*/       0.01,
@@ -157,6 +159,7 @@ function PlasmaBomb()
 
   Weapon.call(this,
   /*Name*/        "Plasma Bombs",
+  /*Auto Rate*/    0,
   /*MaxCharge*/    5,
   /*Charge*/       5,
   /*Refill*/       0.002,

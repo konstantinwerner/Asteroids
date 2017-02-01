@@ -1,7 +1,10 @@
-function Weapon(name, maxcharge, charge, refill, shape,
+function Weapon(name, auto_rate, maxcharge, charge, refill, shape,
                 projectile_speed, projectile_inertia, projectile)
 {
   this.name = name;
+
+  //AutoRate = n : Fire every nth Frame
+  this.auto_rate = auto_rate;
 
   this.maxcharge = maxcharge;
   this.charge = charge;

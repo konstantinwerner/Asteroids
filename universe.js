@@ -33,19 +33,26 @@ Universe.prototype =
 
   keyPressed: function(key)
   {
-    console.log(key);
+    console.log("v " + key);
 
     switch (key)
     {
     case 80: this.pause(); return false;   // Pause
     case 82: this.create(); return false;  // New Game
     case 78: this.ship.cycleWeapon(+1); return false; // Next Weapon
-    case 32:
-      this.projectiles = this.projectiles.concat(this.ship.fire());
-    return false;
+    case 32: this.ship.fire(true); return false;
     }
 
     return true;
+  },
+
+  keyReleased: function(key)
+  {
+    console.log("^ " + key);
+    switch (key)
+    {
+    case 32: this.ship.fire(false); return false;
+    }
   },
 
   keyDown: function()
@@ -129,6 +136,11 @@ Universe.prototype =
     {
       for (var i = 0; i < this.objects.length; ++i)
         this.objects[i].update();
+
+      // Get Projectiles fired by the Ship
+      this.projectiles = this.projectiles.concat(this.ship.getProjectiles());
+      // Clear the projectiles stored by the ship
+      this.ship.clearProjectiles();
 
       for (var i = this.projectiles.length-1; i >= 0; --i)
       {

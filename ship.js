@@ -3,6 +3,7 @@ function Ship()
   // Size and Mass
   this.mass = 100;
   this.size = 50;
+  this.age  = 0;
 
   // shape
   this.vertex = [
@@ -35,12 +36,16 @@ function Ship()
   this.shieldBlink = 0;
 
   // Weapons
+  this.firing = false;
   this.weapon = 0;
   this.weapons = [
     new Laser(),
     new ProtonGun(),
     new PlasmaBomb()
   ];
+
+  // Array to collect projectiles produced by firing weapons
+  this.projectiles = [];
 }
 
 Ship.prototype =
@@ -91,10 +96,26 @@ Ship.prototype =
       this.weapon = this.weapons.length-1;
   },
 
-  fire: function()
+  fire: function(fire)
   {
-    // Fire Weapon and return Projectiles
-    return this.weapons[this.weapon].fire(this.pos, this.vel, this.heading);
+    if (this.weapons[this.weapon].auto_rate > 0)  // Automatic Weapon
+      this.firing = fire;
+    else
+    {
+      if (fire) // Single Shot Weapon
+      this.projectiles = this.projectiles.
+                         concat(this.weapons[this.weapon].fire(this.pos, this.vel, this.heading));
+    }
+  },
+
+  getProjectiles: function()
+  {
+    return this.projectiles;
+  },
+
+  clearProjectiles: function()
+  {
+    this.projectiles = [];
   },
 
   isHitBy: function(pos, size)
@@ -112,9 +133,19 @@ Ship.prototype =
 
   update: function()
   {
+    this.age++;
+
     // Shield refill
     if (this.shield < 100)
       this.shield += this.shield_refill;
+
+    // Automatic Firing (AutoRate = n : Fire every nth Frame)
+    if (this.firing &&
+        (this.age % this.weapons[this.weapon].auto_rate == 0))
+    {
+      this.projectiles = this.projectiles.
+                         concat(this.weapons[this.weapon].fire(this.pos, this.vel, this.heading));
+    }
 
     for (var i = 0; i < this.weapons.length; ++i)
        this.weapons[i].update();

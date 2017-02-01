@@ -23,7 +23,7 @@ function keyPressed()
 
 function keyReleased()
 {
-
+return universe.keyReleased(keyCode);
 }
 
 function draw()
