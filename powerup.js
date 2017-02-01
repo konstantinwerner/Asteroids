@@ -24,11 +24,13 @@ Powerup.prototype =
 
   applyTo: function(ship)
   {
+    //TODO: Add temporary effects
+
     for (var p = 0; p < this.changes.length; ++p)
     {
       if (ship[this.changes[p].property] != undefined)
       {
-        // TODO: Make Array-properies changeable
+        // TODO: Make Subproperties changeable
 
         if (this.changes[p].type == "set")
           ship[this.changes[p].property] = this.changes[p].value;
@@ -78,8 +80,10 @@ Powerup.prototype =
       translate(this.pos.x, this.pos.y);
       rotate(this.heading * PI / 180);
 
+      var fade = 55 + 200 * (1 - (this.age / this.ttl));
+
       noFill();
-      stroke(55 + 200 * (1 - (this.age / this.ttl)));
+      stroke(fade);
       strokeWeight(1);
 
       if (this.shape)
@@ -91,6 +95,12 @@ Powerup.prototype =
 
         endShape(CLOSE);
       }
+
+      noStroke();
+      fill(fade);
+      textSize(10);
+      textAlign(CENTER, CENTER);
+      text(this.name, 0, 12);
 
       pop();
     }

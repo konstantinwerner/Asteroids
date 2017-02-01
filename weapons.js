@@ -33,7 +33,7 @@ function Laser()
 
   Weapon.call(this,
   /*Name*/        "Laser",
-  /*Auto Rate*/    3,
+  /*Auto Rate*/    4,
   /*MaxCharge*/    100,
   /*Charge*/       100,
   /*Refill*/       0.1,

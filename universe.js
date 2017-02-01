@@ -1,6 +1,6 @@
 function Universe()
 {
-  this.version = "v1.5";
+  this.version = "v1.6";
 
   // The Players Ship
   this.ship = {};
@@ -95,7 +95,7 @@ Universe.prototype =
         this.powerups.push(
           new this.availablePowerUps[p].obj(asteroid.pos, asteroid.vel.mult(0.25), asteroid.heading));
 
-        console.log("Dropped Powerup [" + this.powerups.slice(-1)[0].name + "]");
+        //console.log("Dropped Powerup [" + this.powerups.slice(-1)[0].name + "]");
         break; // Do not drop more than one powerup at once
       }
     }
