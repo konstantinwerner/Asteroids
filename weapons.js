@@ -10,7 +10,7 @@ function LaserProjectile()
                   0, 0, 0,
                   shape,
  /*Power*/        1,
- /*TTL*/          10,
+ /*TTL*/          38,
  /*HitFrames*/    0,
  /*HitAnimation*/ undefined);
 }
@@ -63,7 +63,7 @@ function ProtonGunProjectile()
                   0, 0, 0,
                   shape,
  /*Power*/        3,
- /*TTL*/          40,
+ /*TTL*/          60,
  /*HitFrames*/    5,
  /*HitAnimation*/ hitAnimation);
 }
