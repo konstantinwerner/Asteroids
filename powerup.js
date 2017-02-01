@@ -1,10 +1,13 @@
-function Powerup(p, v, h, shape, ttl, changes)
+function Powerup(name, p, v, h, shape, size, ttl, changes)
 {
+  this.name = name;
+
   this.pos = createVector(p.x, p.y);
   this.vel = createVector(v.x, v.y);
   this.heading = h;
 
   this.shape = shape;
+  this.size = size;
   this.ttl = ttl;
   this.changes = changes;
 
@@ -19,12 +22,14 @@ Powerup.prototype =
     return ((this.age > this.ttl) || (this.hasHit));
   },
 
-  apply: function(ship)
+  applyTo: function(ship)
   {
-    for (var p = 0; p < this.changes.length-1; ++p)
+    for (var p = 0; p < this.changes.length; ++p)
     {
       if (ship[this.changes[p].property] != undefined)
       {
+        // TODO: Make Array-properies changeable
+
         if (this.changes[p].type == "set")
           ship[this.changes[p].property] = this.changes[p].value;
 
@@ -74,7 +79,7 @@ Powerup.prototype =
       rotate(this.heading * PI / 180);
 
       noFill();
-      stroke(255 * (1-(this.age / this.ttl)));
+      stroke(55 + 200 * (1 - (this.age / this.ttl)));
       strokeWeight(1);
 
       if (this.shape)

@@ -30,7 +30,7 @@ Projectile.prototype =
   {
     // To be overridden
     noFill();
-    stroke(255 * (1-(this.age / this.ttl)));
+    stroke(25 + 220 * (1 - (this.age / this.ttl)));
     strokeWeight(1);
 
     if (this.shape)
@@ -43,7 +43,7 @@ Projectile.prototype =
       endShape(CLOSE);
     }
   },
-
+/*
   getCopy: function(p, v, h)
   {
     return new Projectile(p, v, h,
@@ -53,7 +53,7 @@ Projectile.prototype =
                           this.flyAnimation,
                           this.hitAnimation);
   },
-
+*/
   isDecayed: function()
   {
     return ((this.age > this.ttl) || (this.hitEnd));

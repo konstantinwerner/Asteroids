@@ -1,4 +1,4 @@
-function LaserProjectile()
+function LaserProjectile(p, v, h)
 {
   // TODO: Move to prototype
   var shape  = [
@@ -17,10 +17,10 @@ function LaserProjectile()
   };
 
   Projectile.call(this,
-                  0, 0, 0,
+                  p, v, h,
                   shape,
  /*Power*/        1,
- /*TTL*/          30,
+ /*TTL*/          15,
                   undefined,
                   undefined);
 
@@ -40,13 +40,13 @@ function Laser()
   /*Shape*/        this.shape,
   /*Proj.Speed*/   35,
   /*Proj.Inertia*/ 0,
-                   new LaserProjectile);
+                   LaserProjectile);
 }
 Laser.prototype = Object.create(Weapon.prototype);
 
 //------------------------------------------------------------------------------
 
-function ProtonGunProjectile()
+function ProtonGunProjectile(p, v, h)
 {
   // TODO: Move to prototype
   var shape  = [
@@ -78,7 +78,7 @@ function ProtonGunProjectile()
   };
 
   Projectile.call(this,
-                  0, 0, 0,
+                  p, v, h,
                   shape,
  /*Power*/        3,
  /*TTL*/          60,
@@ -102,13 +102,13 @@ function ProtonGun()
   /*Shape*/        this.shape,
   /*Proj.Speed*/   10,
   /*Proj.Inertia*/ 0.25,
-                   new ProtonGunProjectile);
+                   ProtonGunProjectile);
 }
 ProtonGun.prototype = Object.create(Weapon.prototype);
 
 //------------------------------------------------------------------------------
 
-function PlasmaBombProjectile()
+function PlasmaBombProjectile(p, v, h)
 {
   // TODO: Move to prototype
   var shape  = [
@@ -143,7 +143,7 @@ function PlasmaBombProjectile()
   };
 
   Projectile.call(this,
-                  0, 0, 0,
+                  p, v, h,
                   shape,
  /*Power*/        5,
  /*TTL*/          200,
@@ -166,6 +166,6 @@ function PlasmaBomb()
   /*Shape*/        this.shape,
   /*Proj.Speed*/   0,
   /*Proj.Inertia*/ 0.0,
-                   new PlasmaBombProjectile);
+                   PlasmaBombProjectile);
 }
 PlasmaBomb.prototype = Object.create(Weapon.prototype);

@@ -11,6 +11,11 @@ function Universe()
   // Array of Asteroids
   this.asteroids = [];
 
+  // Possible PowerUps
+  this.availablePowerUps = [
+    { chance: 4, obj: ShieldPowerup }
+  ];
+
   // State of the Universe
   state = { INITALIZING: -1, PLAYING : 0, PAUSED: 1, WON: 2, LOST: 3 };
   this.state = state.INITALIZING;
@@ -37,7 +42,7 @@ Universe.prototype =
 
   keyPressed: function(key)
   {
-    console.log("v " + key);
+    //console.log("v " + key);
 
     switch (key)
     {
@@ -52,7 +57,8 @@ Universe.prototype =
 
   keyReleased: function(key)
   {
-    console.log("^ " + key);
+    //console.log("^ " + key);
+
     switch (key)
     {
     case 32: this.ship.fire(false); return false;
@@ -80,11 +86,35 @@ Universe.prototype =
     }
   },
 
+  dropPowerup: function(asteroid)
+  {
+    for (var p = 0; p < this.availablePowerUps.length; ++p)
+    {
+      if (random(100) < this.availablePowerUps[p].chance)
+      {
+        this.powerups.push(
+          new this.availablePowerUps[p].obj(asteroid.pos, asteroid.vel.mult(0.25), asteroid.heading));
+
+        console.log("Dropped Powerup [" + this.powerups.slice(-1)[0].name + "]");
+        break; // Do not drop more than one powerup at once
+      }
+    }
+  },
+
   collide: function()
   {
     // Only check collisions if state.PLAYING
     if (this.state == state.PLAYING)
     {
+      // Powerup-Ship Collisions
+      for (var p = this.powerups.length-1; p >= 0; --p)
+      {
+        if (this.ship.isHitBy(this.powerups[p].pos, this.powerups[p].size))
+        {
+          this.powerups[p].applyTo(this.ship);
+        }
+      }
+
       // Check all Asteroids for Collisions
       for (var a = this.asteroids.length-1; a >= 0; --a)
       {
@@ -109,6 +139,8 @@ Universe.prototype =
 
             // Increase Score
             this.ship.score += floor(this.asteroids[a].maxsize / this.asteroids[a].size * 10);
+
+            this.dropPowerup(this.asteroids[a]);
 
             // Remove destroyed asteroid
             this.asteroids.splice(a, 1);
@@ -138,8 +170,14 @@ Universe.prototype =
     // Update Objects, Projectiles and Ship only if state.PLAYING
     if (this.state == state.PLAYING)
     {
-      for (var i = 0; i < this.objects.length; ++i)
-        this.objects[i].update();
+      for (var i = 0; i < this.powerups.length; ++i)
+      {
+        this.powerups[i].update();
+
+        // If this Powerup has decayed remove it
+        if (this.powerups[i].isDecayed())
+          this.powerups.splice(i, 1);
+      }
 
       // Get Projectiles fired by the Ship
       this.projectiles = this.projectiles.concat(this.ship.getProjectiles());
@@ -168,8 +206,8 @@ Universe.prototype =
     // Render Objects, Projectiles and Ship only if state.PLAYING or state.PAUSED
     if (this.state == state.PLAYING || this.state == state.PAUSED)
     {
-      for (var i = 0; i < this.objects.length; ++i)
-        this.objects[i].render();
+      for (var i = 0; i < this.powerups.length; ++i)
+        this.powerups[i].render();
 
       for (var i = 0; i < this.projectiles.length; ++i)
           this.projectiles[i].render();

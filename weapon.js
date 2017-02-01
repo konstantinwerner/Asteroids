@@ -28,7 +28,7 @@ Weapon.prototype =
       vel = vel.mult(this.projectile_speed);
       var v_in = createVector(v.x, v.y).mult(this.projectile_inertia);
 
-      var projectiles = [this.projectile.getCopy(p, vel.add(v_in), h)];
+      var projectiles = [new this.projectile(p, vel.add(v_in), h)];
 
       this.charge--;
 
