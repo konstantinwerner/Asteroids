@@ -22,30 +22,45 @@ Powerup.prototype =
     return ((this.age > this.ttl) || (this.hasHit));
   },
 
-  applyTo: function(ship)
+  applyTo: function(universe)
   {
     //TODO: Add temporary effects
 
     for (var p = 0; p < this.changes.length; ++p)
     {
-      if (ship[this.changes[p].property] != undefined)
-      {
-        // TODO: Make Subproperties changeable
+      var obj = index(universe, this.changes[p].obj);
 
+      if (obj[this.changes[p].property] != undefined)
+      {
         if (this.changes[p].type == "set")
-          ship[this.changes[p].property] = this.changes[p].value;
+        {
+          obj[this.changes[p].property] = this.changes[p].value;
+          continue;
+        }
 
         if (this.changes[p].type == "add")
-            ship[this.changes[p].property] += this.changes[p].value;
+        {
+          obj[this.changes[p].property] += this.changes[p].value;
+          continue;
+        }
 
         if (this.changes[p].type == "sub")
-            ship[this.changes[p].property] -= this.changes[p].value;
+        {
+          obj[this.changes[p].property] -= this.changes[p].value;
+          continue;
+        }
 
         if (this.changes[p].type == "mul")
-            ship[this.changes[p].property] *= this.changes[p].value;
+        {
+          obj[this.changes[p].property] *= this.changes[p].value;
+          continue;
+        }
 
         if (this.changes[p].type == "div")
-            ship[this.changes[p].property] /= this.changes[p].value;
+        {
+          obj[this.changes[p].property] /= this.changes[p].value;
+          continue;
+        }
       }
     }
 

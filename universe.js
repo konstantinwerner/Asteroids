@@ -13,7 +13,8 @@ function Universe()
 
   // Possible PowerUps
   this.availablePowerUps = [
-    { chance: 4, obj: ShieldPowerup }
+    { chance: 4, obj: ShieldPowerup },
+    { chance: 3, obj: LaserPowerup }
   ];
 
   // State of the Universe
@@ -38,7 +39,7 @@ Universe.prototype =
     }
 
     this.ship = new Ship(pilotName);
-    this.objects = [];
+    this.powerups = [];
     this.projectiles = [];
     this.asteroids = [];
 
@@ -133,7 +134,7 @@ Universe.prototype =
       {
         if (this.ship.isHitBy(this.powerups[p].pos, this.powerups[p].size))
         {
-          this.powerups[p].applyTo(this.ship);
+          this.powerups[p].applyTo(this);
         }
       }
 
@@ -251,8 +252,8 @@ Universe.prototype =
       text(this.ship.pilot, 20, 25);
       textSize(20);
       text("Score: " + this.ship.score, 20, 50);
-      text("Hits : " + this.ship.asteroidsDestroyed, 20, 70);
-      text("Shots: " + this.ship.projectilesFired, 20, 90);
+      text("Shots: " + this.ship.projectilesFired, 20, 70);
+      text("Hits : " + this.ship.asteroidsDestroyed, 20, 90);
 
       // Show Help Text
       textAlign(CENTER, CENTER);

@@ -18,12 +18,12 @@ function setup()
 
 function keyPressed()
 {
-    return universe.keyPressed(keyCode);
+  return universe.keyPressed(keyCode);
 }
 
 function keyReleased()
 {
-return universe.keyReleased(keyCode);
+  return universe.keyReleased(keyCode);
 }
 
 function draw()
