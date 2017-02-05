@@ -1,11 +1,17 @@
-function Ship()
+function Ship(name)
 {
+  this.pilot = name;
+  this.score = 0;
+  this.asteroidsDestroyed = 0;
+  this.projectilesFired = 0;
+  this.timeSurvived = 0;
+
   // Size and Mass
   this.mass = 100;
   this.size = 50;
   this.age  = 0;
 
-  // shape
+  // Shape
   this.vertex = [
     createVector(0, -this.size),
     createVector(+this.size/2, +this.size/2),
@@ -21,9 +27,6 @@ function Ship()
 
   this.omega = 0;
   this.omega_dot = 0;
-
-  // Score
-  this.score = 0;
 
   // HUD
   this.hud = true;
@@ -50,6 +53,11 @@ function Ship()
 
 Ship.prototype =
 {
+  setPilotName: function(name)
+  {
+    this.pilot = name;
+  },
+
   keyDown: function()
   {
     if (keyIsDown(RIGHT_ARROW))
@@ -102,8 +110,11 @@ Ship.prototype =
       this.firing = fire;
 
     if (fire) // Single Shot Weapon
-    this.projectiles = this.projectiles.
-                       concat(this.weapons[this.weapon].fire(this.pos, this.vel, this.heading));
+    {
+      var newProjectiles = this.weapons[this.weapon].fire(this.pos, this.vel, this.heading);
+      this.projectiles = this.projectiles.concat(newProjectiles);
+      this.projectilesFired += newProjectiles.length;
+    }
   },
 
   getProjectiles: function()
@@ -141,8 +152,9 @@ Ship.prototype =
     if (this.firing &&
         (this.age % this.weapons[this.weapon].auto_rate == 0))
     {
-      this.projectiles = this.projectiles.
-                         concat(this.weapons[this.weapon].fire(this.pos, this.vel, this.heading));
+      var newProjectiles = this.weapons[this.weapon].fire(this.pos, this.vel, this.heading);
+      this.projectiles = this.projectiles.concat(newProjectiles);
+      this.projectilesFired += newProjectiles.length;
     }
 
     for (var i = 0; i < this.weapons.length; ++i)

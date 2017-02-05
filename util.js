@@ -21,6 +21,13 @@ inherits = function (child, parent)
     child.prototype = subProto;
 }
 
+function getCookie(name)
+{
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length == 2) return parts.pop().split(";").shift();
+}
+
 function polygon(x, y, radius, npoints)
 {
   var angle = TWO_PI / npoints;

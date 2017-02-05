@@ -1,0 +1,56 @@
+html
+{
+  height: 100%;
+  overflow: hidden;
+}
+
+body
+{
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: monospace;
+}
+
+div#nameInput
+{
+  position: absolute;
+  margin: auto;
+  top: -250px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  width: 200px;
+  height: 100px;
+
+  background-color: rgba(0, 0, 0, 0.8);
+  border: solid 1px #FFFFFF;
+  color: #FFFFFF;
+}
+
+div#nameInput p
+{
+  width: 100%;
+  text-align: center;
+}
+
+div#nameInput input,
+div#nameInput button
+{
+  border: solid 1px #FFFFFF;
+  background-color: #000000;
+  color: #FFFFFF;
+  font-family: monospace;
+}
+
+div#nameInput button
+{
+  cursor: pointer;
+}
+
+div#nameInput button:hover
+{
+  background-color: #FFFFFF;
+  color: #000000;
+}

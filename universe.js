@@ -25,7 +25,19 @@ Universe.prototype =
 {
   create: function()
   {
-    this.ship = new Ship();
+    document.title = "Asteroids " + this.version;
+
+    var s = state.INITALIZING;
+    var pilotName = getCookie("asteroids_pilotName");
+
+    if (pilotName == "" || pilotName == undefined)
+    {
+      select("#nameInput").elt.style.visibility = "";
+    } else {
+      s = state.PLAYING;
+    }
+
+    this.ship = new Ship(pilotName);
     this.objects = [];
     this.projectiles = [];
     this.asteroids = [];
@@ -35,9 +47,19 @@ Universe.prototype =
     for (var a = 0; a < noOfAsteroids; ++a)
       this.asteroids.push(new Asteroid);
 
-    this.state = state.PLAYING;
+    this.state = s;
+  },
 
-    document.title = "Asteroids " + this.version;
+  setPilotName: function()
+  {
+    var name = select("#pilotName").elt.value;
+    document.cookie = "asteroids_pilotName=" + name + "";
+
+    this.ship.setPilotName(name);
+
+    select("#nameInput").elt.style.visibility = "hidden";
+
+    this.state = state.PLAYING;
   },
 
   keyPressed: function(key)
@@ -46,10 +68,10 @@ Universe.prototype =
 
     switch (key)
     {
-    case 80: this.pause(); return false;   // Pause
-    case 82: this.create(); return false;  // New Game
-    case 78: this.ship.cycleWeapon(+1); return false; // Next Weapon
-    case 32: this.ship.fire(true); return false;
+    case 80: this.pause(); return true;   // Pause
+    case 82: this.create(); return true;  // New Game
+    case 78: this.ship.cycleWeapon(+1); return true; // Next Weapon
+    case 32: this.ship.fire(true); return true;
     }
 
     return true;
@@ -61,7 +83,7 @@ Universe.prototype =
 
     switch (key)
     {
-    case 32: this.ship.fire(false); return false;
+    case 32: this.ship.fire(false); return true;
     }
   },
 
@@ -139,6 +161,7 @@ Universe.prototype =
 
             // Increase Score
             this.ship.score += floor(this.asteroids[a].maxsize / this.asteroids[a].size * 10);
+            this.ship.asteroidsDestroyed++;
 
             this.dropPowerup(this.asteroids[a]);
 
@@ -161,7 +184,7 @@ Universe.prototype =
   update: function()
   {
     // Update Asteroids if not state.PAUSED
-    if (this.state != state.PAUSED)
+    if (this.state != state.PAUSED && this.state != state.INITALIZING)
     {
       for (var i = 0; i < this.asteroids.length; ++i)
         this.asteroids[i].update();
@@ -218,16 +241,21 @@ Universe.prototype =
       push();
 
       textFont("Courier");
-      textAlign(CENTER, CENTER);
       textStyle(BOLD);
       fill(255);
       noStroke();
 
       // Show Score
+      textAlign(LEFT, CENTER);
+      textSize(25);
+      text(this.ship.pilot, 20, 25);
       textSize(20);
-      text(this.ship.score, width/2, 30);
+      text("Score: " + this.ship.score, 20, 50);
+      text("Hits : " + this.ship.asteroidsDestroyed, 20, 70);
+      text("Shots: " + this.ship.projectilesFired, 20, 90);
 
       // Show Help Text
+      textAlign(CENTER, CENTER);
       textSize(15);
       text("[r] New Game    [p] Pause Game    [n] Cycle Weapon    [Arrows] Move Ship    [Space] Fire Weapon",
       width/2, height-20);

@@ -33,10 +33,10 @@ function Laser()
 
   Weapon.call(this,
   /*Name*/        "Laser",
-  /*Auto Rate*/    4,
+  /*Auto Rate*/    3,
   /*MaxCharge*/    100,
   /*Charge*/       100,
-  /*Refill*/       0.1,
+  /*Refill*/       0.2,
   /*Shape*/        this.shape,
   /*Proj.Speed*/   35,
   /*Proj.Inertia*/ 0,
