@@ -12,6 +12,8 @@ body
   font-family: monospace;
 }
 
+/*****************************************************************************/
+
 div#nameInput
 {
   position: absolute;
@@ -53,4 +55,48 @@ div#nameInput button:hover
 {
   background-color: #FFFFFF;
   color: #000000;
+}
+
+/*****************************************************************************/
+
+div#highscore
+{
+  position: absolute;
+  margin: auto;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  padding: 0px;
+
+  width: 500px;
+  height: 70%;
+
+  background-color: rgba(0, 0, 0, 0.9);
+  border: solid 1px #FFFFFF;
+  color: #FFFFFF;
+}
+
+div#highscore p
+{
+  margin-top: 10px;
+  margin-bottom: 10px;
+
+  width: 100%;
+
+  font-size: 50px;
+  font-weight: 800;
+  text-align: center;
+}
+
+table#highscoreTable
+{
+  width: 100%;
+}
+
+table#highscoreTable th
+{
+  text-align: center;
+  color: #FFFFFF;
 }

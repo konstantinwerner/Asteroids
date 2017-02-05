@@ -1,6 +1,6 @@
 function Universe()
 {
-  this.version = "v1.6";
+  this.version = "v2.3";
 
   // The Players Ship
   this.ship = {};
@@ -61,6 +61,37 @@ Universe.prototype =
     select("#nameInput").elt.style.visibility = "hidden";
 
     this.state = state.PLAYING;
+  },
+
+  sendHighscore: function()
+  {
+    var highscore = {
+      name: this.ship.pilot,
+      score: this.ship.score,
+      hits: this.ship.asteroidsDestroyed,
+      shots: this.ship.projectilesFired
+    };
+
+    var highscoreString = JSON.stringify(highscore);
+
+    console.log(highscoreString);
+
+    var data = new FormData();
+    data.append("highscore", highscoreString);
+
+    var xhr = (window.XMLHttpRequest) ? new XMLHttpRequest() : new activeXObject("Microsoft.XMLHTTP");
+
+    xhr.open('post', 'highscore.php', true);
+    xhr.send(data);
+  },
+
+  showHighscores: function()
+  {
+    loadJSON("highscore.json",
+      function(highscores)
+      {
+        console.log(highscores);
+      });
   },
 
   keyPressed: function(key)
@@ -178,7 +209,11 @@ Universe.prototype =
         this.state = state.WON;
 
       if (this.ship.shield <= 0)
+      {
         this.state = state.LOST;
+        this.sendHighscore();
+        this.showHighscores();
+      }
     }
   },
 
