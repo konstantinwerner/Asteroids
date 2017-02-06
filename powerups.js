@@ -8,7 +8,8 @@ function PointsPowerup(p, v, h)
   ];
 
   var changes = [
-    { obj: "ship", property: "score", type: "add", value: (round(random(1,5))*5) } // Add Extrapoints
+    // Add Extrapoints
+    { obj: "ship", property: "score", type: "add", value: (round(random(1,5))*5), duration: 0 }
   ];
 
   Powerup.call(this,
@@ -17,8 +18,7 @@ function PointsPowerup(p, v, h)
                shape,
                10,
    /*TTL*/     50,
-               changes,
-  /*Duration*/ 0);
+               changes);
 }
 
 PointsPowerup.prototype = Object.create(Powerup.prototype);
@@ -34,7 +34,10 @@ function ShieldPowerup(p, v, h)
   ];
 
   var changes = [
-    { obj: "ship", property: "shield", type: "set", value: 100 } // Set Shield to 100%
+    // Set Shield to 100%
+    { obj: "ship", property: "shield", type: "set", value: 100, duration: 0 },
+    // Double Shield Refill for 500frames
+    { obj: "ship", property: "shield_refill", type: "mul", value: 2, duration: 500 },
   ];
 
   Powerup.call(this,
@@ -43,8 +46,7 @@ function ShieldPowerup(p, v, h)
                shape,
                10,
    /*TTL*/     150,
-               changes,
-  /*Duration*/ 0);
+               changes);
 }
 
 ShieldPowerup.prototype = Object.create(Powerup.prototype);
@@ -61,7 +63,8 @@ function LaserPowerup(p, v, h)
   ];
 
   var changes = [
-    { obj: "ship.weapons[0]", property: "charge", type: "set", value: 100 } // Set Laser Charge to 100%
+    // Set Laser Charge to 100%
+    { obj: "ship.weapons[0]", property: "charge", type: "set", value: 100, duration: 0 }
   ];
 
   Powerup.call(this,
@@ -70,8 +73,7 @@ function LaserPowerup(p, v, h)
                shape,
                10,
    /*TTL*/     150,
-               changes,
-  /*Duration*/ 0);
+               changes);
 }
 
 LaserPowerup.prototype = Object.create(Powerup.prototype);
