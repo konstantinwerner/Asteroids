@@ -1,7 +1,7 @@
+const regex = /[\$][\[](\d+)[\]][\.](\w*)/g;
+
 function Powerup(name, p, v, h, shape, size, ttl, changes)
 {
-  this.name = name;
-
   this.pos = createVector(p.x, p.y);
   this.vel = createVector(v.x, v.y);
   this.heading = h;
@@ -13,6 +13,16 @@ function Powerup(name, p, v, h, shape, size, ttl, changes)
 
   this.age = 0;
   this.hasHit = false;
+
+  // Replace variable placeholders with values
+  var found = getMatches(name, regex);
+  if (found.length > 0)
+  {
+    var replacement = this.changes[found[1]][found[2]];
+    this.name = name.replace(found[0], "" + replacement);
+  }
+  else
+    this.name = name;
 }
 
 Powerup.prototype =
@@ -116,7 +126,6 @@ Powerup.prototype =
       textSize(10);
       textAlign(CENTER, CENTER);
       text(this.name, 0, 12);
-
       pop();
     }
   }

@@ -1,3 +1,29 @@
+function PointsPowerup(p, v, h)
+{
+  var shape = [
+    {x: -5, y:  -5},
+    {x: -5, y:  +5},
+    {x: +5, y:  -5},
+    {x: +5, y:  +5}
+  ];
+
+  var changes = [
+    { obj: "ship", property: "score", type: "add", value: (round(random(1,5))*5) } // Add Extrapoints
+  ];
+
+  Powerup.call(this,
+               "$[0].value Points",
+               p, v, h,
+               shape,
+               10,
+   /*TTL*/     50,
+               changes);
+}
+
+PointsPowerup.prototype = Object.create(Powerup.prototype);
+
+//------------------------------------------------------------------------------
+
 function ShieldPowerup(p, v, h)
 {
   var shape = [

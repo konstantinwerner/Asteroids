@@ -13,8 +13,9 @@ function Universe()
 
   // Possible PowerUps
   this.availablePowerUps = [
-    { chance: 4, obj: ShieldPowerup },
-    { chance: 3, obj: LaserPowerup }
+    { chance: 3, obj: ShieldPowerup },
+    { chance: 3, obj: LaserPowerup },
+    { chance: 30, obj: PointsPowerup },
   ];
 
   // State of the Universe
@@ -26,6 +27,7 @@ Universe.prototype =
 {
   create: function()
   {
+    this.hideHighscores();
     document.title = "Asteroids " + this.version;
 
     var s = state.INITALIZING;
@@ -63,35 +65,59 @@ Universe.prototype =
     this.state = state.PLAYING;
   },
 
-  sendHighscore: function()
+  sendHighscore: function(newHighscore)
   {
-    var highscore = {
-      name: this.ship.pilot,
-      score: this.ship.score,
-      hits: this.ship.asteroidsDestroyed,
-      shots: this.ship.projectilesFired
-    };
-
-    var highscoreString = JSON.stringify(highscore);
-
-    console.log(highscoreString);
-
+    var highscoreString = JSON.stringify(newHighscore);
     var data = new FormData();
     data.append("highscore", highscoreString);
 
     var xhr = (window.XMLHttpRequest) ? new XMLHttpRequest() : new activeXObject("Microsoft.XMLHTTP");
-
     xhr.open('post', 'highscore.php', true);
     xhr.send(data);
   },
 
-  showHighscores: function()
+  showHighscores: function(newHighscore)
   {
     loadJSON("highscore.json",
       function(highscores)
       {
-        console.log(highscores);
+        var scores = highscores.scores;
+
+        select("#highscore").elt.style.visibility = "visible";
+        var table = select("#highscoreTable");
+        var body = table.elt.tBodies[0];
+
+        body.innerHTML = "";
+
+        var done = false;
+
+        for (var h = 0; h < scores.length && h < 10;)
+        {
+          if (!done && newHighscore.score > scores[h].score)
+          {
+            body.innerHTML += "<tr><td class='indicator'>&gt;</td>" +
+                              "<td>" + newHighscore.name + "</td>" +
+                              "<td>" + newHighscore.score + "</td>" +
+                              "<td>" + newHighscore.shots + "</td>" +
+                              "<td>" + newHighscore.hits + "</td>";
+
+              done = true;
+          } else {
+            body.innerHTML += "<tr><td></td>" +
+                              "<td>" + scores[h].name + "</td>" +
+                              "<td>" + scores[h].score + "</td>" +
+                              "<td>" + scores[h].shots + "</td>" +
+                              "<td>" + scores[h].hits + "</td>";
+
+            ++h;
+          }
+        }
       });
+  },
+
+  hideHighscores: function()
+  {
+      select("#highscore").elt.style.visibility = "hidden";
   },
 
   keyPressed: function(key)
@@ -209,10 +235,19 @@ Universe.prototype =
         this.state = state.WON;
 
       if (this.ship.shield <= 0)
-      {
         this.state = state.LOST;
-        this.sendHighscore();
-        this.showHighscores();
+
+      if (this.state != state.PLAYING && this.state != state.PAUSED)
+      {
+        var highscore = {
+          name: this.ship.pilot,
+          score: this.ship.score,
+          hits: this.ship.asteroidsDestroyed,
+          shots: this.ship.projectilesFired
+        };
+
+        this.showHighscores(highscore); // Loads current highscores from file and inserts new entry dynamically
+        this.sendHighscore(highscore);  // Writes new entry asynchronously to file
       }
     }
   },

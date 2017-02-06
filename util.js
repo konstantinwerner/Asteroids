@@ -69,21 +69,38 @@ function getCookie(name)
 
 function loadJSON(filename, callback)
 {
-    var xobj = new XMLHttpRequest();
-    xobj.overrideMimeType("application/json");
-    xobj.open('GET', filename, true);
+  var xobj = new XMLHttpRequest();
+  xobj.overrideMimeType("application/json");
+  xobj.open('GET', filename, true);
 
-    xobj.onreadystatechange = function ()
-    {
-          if (xobj.readyState == 4 && xobj.status == "200")
-          {
-            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-            callback(xobj.responseText);
-          }
-    };
+  xobj.onreadystatechange = function ()
+  {
+        if (xobj.readyState == 4 && xobj.status == "200")
+        {
+          // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+          callback(xobj.responseText);
+        }
+  };
 
-    xobj.send(null);
- }
+  xobj.send(null);
+}
+
+function getMatches(str, regex)
+{
+  var result = [];
+
+  while ((m = regex.exec(str)) !== null)
+  {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === regex.lastIndex) {
+      regex.lastIndex++;
+    }
+
+    result = result.concat(m);
+  }
+
+  return result;
+}
 
 function polygon(x, y, radius, npoints)
 {

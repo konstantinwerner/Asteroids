@@ -63,15 +63,14 @@ div#highscore
 {
   position: absolute;
   margin: auto;
-  top: 0;
+  top: 650px;
   right: 0;
-  bottom: 0;
+  /*bottom: 0;*/
   left: 0;
 
-  padding: 0px;
+  padding-bottom: 25px;
 
   width: 500px;
-  height: 70%;
 
   background-color: rgba(0, 0, 0, 0.9);
   border: solid 1px #FFFFFF;
@@ -97,6 +96,18 @@ table#highscoreTable
 
 table#highscoreTable th
 {
+  font-size: 25px;
+  font-weight: 800;
+}
+
+table#highscoreTable th,
+table#highscoreTable td
+{
   text-align: center;
   color: #FFFFFF;
+}
+
+table#highscoreTable td.indicator
+{
+  text-align: right;
 }
