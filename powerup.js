@@ -1,6 +1,6 @@
 const regex = /[\$][\[](\d+)[\]][\.](\w*)/g;
 
-function Powerup(name, p, v, h, shape, size, ttl, changes)
+function Powerup(name, p, v, h, shape, size, ttl, changes, duration)
 {
   this.pos = createVector(p.x, p.y);
   this.vel = createVector(v.x, v.y);
@@ -9,7 +9,10 @@ function Powerup(name, p, v, h, shape, size, ttl, changes)
   this.shape = shape;
   this.size = size;
   this.ttl = ttl;
+  this.duration = duration;
   this.changes = changes;
+
+  this.appliedTo = undefined;
 
   this.age = 0;
   this.hasHit = false;
@@ -29,13 +32,13 @@ Powerup.prototype =
 {
   isDecayed: function()
   {
-    return ((this.age > this.ttl) || (this.hasHit));
+    // To old or duration has expired
+    return ((this.age > this.ttl) ||
+            (this.hasHit && this.age > this.duration));
   },
 
   applyTo: function(universe)
   {
-    //TODO: Add temporary effects
-
     for (var p = 0; p < this.changes.length; ++p)
     {
       var obj = index(universe, this.changes[p].obj);
@@ -75,30 +78,37 @@ Powerup.prototype =
     }
 
     this.hasHit = true;
+    this.age = 0; // Reset Age to count duration
   },
 
   update: function()
   {
     this.age++;
 
-    // Move
-    this.pos.add(this.vel);
+    if (this.hasHit)
+    {
 
-    // Keep on screen
-    if (this.pos.x > width)
-      this.pos.x = 0;
-    else if (this.pos.x < 0)
-      this.pos.x = width;
+    } else
+    {
+      // Move
+      this.pos.add(this.vel);
 
-    if (this.pos.y > height)
-      this.pos.y = 0;
-    else if (this.pos.y < 0)
-      this.pos.y = height;
+      // Keep on screen
+      if (this.pos.x > width)
+        this.pos.x = 0;
+      else if (this.pos.x < 0)
+        this.pos.x = width;
+
+      if (this.pos.y > height)
+        this.pos.y = 0;
+      else if (this.pos.y < 0)
+        this.pos.y = height;
+    }
   },
 
   render: function()
   {
-    if (this.age < this.ttl)
+    if (!this.hasHit)
     {
       push();
 

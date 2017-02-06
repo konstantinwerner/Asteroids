@@ -1,6 +1,6 @@
 function Universe()
 {
-  this.version = "v2.3";
+  this.version = "v3.0";
 
   // The Players Ship
   this.ship = {};
@@ -15,12 +15,18 @@ function Universe()
   this.availablePowerUps = [
     { chance: 3, obj: ShieldPowerup },
     { chance: 3, obj: LaserPowerup },
-    { chance: 30, obj: PointsPowerup },
+    { chance: 10, obj: PointsPowerup },
   ];
 
   // State of the Universe
   state = { INITALIZING: -1, PLAYING : 0, PAUSED: 1, WON: 2, LOST: 3 };
   this.state = state.INITALIZING;
+
+  // Highscores
+  this.highscores = undefined;
+  this.highscoresLoaded = false;
+  this.highscoresVisible = false;
+  this.lasttime = millis();
 }
 
 Universe.prototype =
@@ -76,48 +82,87 @@ Universe.prototype =
     xhr.send(data);
   },
 
-  showHighscores: function(newHighscore)
+  loadHighscores: function()
   {
-    loadJSON("highscore.json",
-      function(highscores)
+    this.highscoresLoaded = false;
+
+    // Add Timestamp to bypass caching
+    url = "highscore.json?timestamp=" + (new Date()).getTime();
+
+    loadJSON(url, function(data)
+    {
+      this.universe.highscores = data;
+      this.universe.highscoresLoaded = true;
+    });
+  },
+
+  renderHighscores: function()
+  {
+    if (this.highscoresLoaded == true &&
+        this.highscores != undefined)
+    {
+      var count = select("#gameCount");
+      count.elt.innerHTML = this.highscores.games_played + " Games played";
+
+      var scores = this.highscores.scores;
+      var table = select("#highscoreTable");
+      var body = table.elt.tBodies[0];
+
+      body.innerHTML = "";
+
+      var done = false;
+
+      for (var h = 0; h < scores.length && h < 10;)
       {
-        var scores = highscores.scores;
-
-        select("#highscore").elt.style.visibility = "visible";
-        var table = select("#highscoreTable");
-        var body = table.elt.tBodies[0];
-
-        body.innerHTML = "";
-
-        var done = false;
-
-        for (var h = 0; h < scores.length && h < 10;)
+        // Show current score in list
+        if (!done &&
+           this.state == state.PAUSED &&
+           this.ship.score > scores[h].score)
         {
-          if (!done && newHighscore.score > scores[h].score)
-          {
-            body.innerHTML += "<tr><td class='indicator'>&gt;</td>" +
-                              "<td>" + newHighscore.name + "</td>" +
-                              "<td>" + newHighscore.score + "</td>" +
-                              "<td>" + newHighscore.shots + "</td>" +
-                              "<td>" + newHighscore.hits + "</td>";
+          body.innerHTML += "<tr class='indicator'>" +
+                            "<td class='indicator'>&gt;</td>" +
+                            "<td>" + this.ship.pilot + "</td>" +
+                            "<td>" + this.ship.score + "</td>" +
+                            "<td>" + this.ship.projectilesFired + "</td>" +
+                            "<td>" + this.ship.asteroidsDestroyed + "</td>";
 
-              done = true;
-          } else {
-            body.innerHTML += "<tr><td></td>" +
-                              "<td>" + scores[h].name + "</td>" +
-                              "<td>" + scores[h].score + "</td>" +
-                              "<td>" + scores[h].shots + "</td>" +
-                              "<td>" + scores[h].hits + "</td>";
+            done = true;
+        } else {
+          body.innerHTML += "<tr><td></td>" +
+                            "<td>" + scores[h].name + "</td>" +
+                            "<td>" + scores[h].score + "</td>" +
+                            "<td>" + scores[h].shots + "</td>" +
+                            "<td>" + scores[h].hits + "</td>";
 
-            ++h;
-          }
+          ++h;
         }
-      });
+      }
+
+      if (!done && this.state == state.PAUSED)
+      {
+        body.innerHTML += "<tr class='indicator'>" +
+                          "<td class='indicator'>&gt;</td>" +
+                          "<td>" + this.ship.pilot + "</td>" +
+                          "<td>" + this.ship.score + "</td>" +
+                          "<td>" + this.ship.projectilesFired + "</td>" +
+                          "<td>" + this.ship.asteroidsDestroyed + "</td>";
+      }
+    }
+  },
+
+  showHighscores: function()
+  {
+    this.lasttime = millis();
+    this.loadHighscores();
+
+    this.showhighscores = true;
+    select("#highscore").elt.style.visibility = "visible";
   },
 
   hideHighscores: function()
   {
-      select("#highscore").elt.style.visibility = "hidden";
+    this.showhighscores = false;
+    select("#highscore").elt.style.visibility = "hidden";
   },
 
   keyPressed: function(key)
@@ -126,10 +171,10 @@ Universe.prototype =
 
     switch (key)
     {
-    case 80: this.pause(); return true;   // Pause
-    case 82: this.create(); return true;  // New Game
-    case 78: this.ship.cycleWeapon(+1); return true; // Next Weapon
-    case 32: this.ship.fire(true); return true;
+    case 80: this.pause(); return true;               // Pause
+    case 82: this.create(); return true;              // New Game
+    case 78: this.ship.cycleWeapon(+1); return true;  // Next Weapon
+    case 32: this.ship.fire(true); return true;       // Fire Weapon
     }
 
     return true;
@@ -158,11 +203,13 @@ Universe.prototype =
     {
       this.state = state.PAUSED;
       document.title = "Asteroids " + this.version + " [PAUSED]";
+      this.showHighscores();
     }
     else if (this.state == state.PAUSED)
     {
       this.state = state.PLAYING;
       document.title = "Asteroids " + this.version;
+      this.hideHighscores();
     }
   },
 
@@ -175,7 +222,6 @@ Universe.prototype =
         this.powerups.push(
           new this.availablePowerUps[p].obj(asteroid.pos, asteroid.vel.mult(0.25), asteroid.heading));
 
-        //console.log("Dropped Powerup [" + this.powerups.slice(-1)[0].name + "]");
         break; // Do not drop more than one powerup at once
       }
     }
@@ -237,7 +283,8 @@ Universe.prototype =
       if (this.ship.shield <= 0)
         this.state = state.LOST;
 
-      if (this.state != state.PLAYING && this.state != state.PAUSED)
+      if (this.state == state.WON ||
+          this.state == state.LOST)
       {
         var highscore = {
           name: this.ship.pilot,
@@ -246,8 +293,9 @@ Universe.prototype =
           shots: this.ship.projectilesFired
         };
 
-        this.showHighscores(highscore); // Loads current highscores from file and inserts new entry dynamically
         this.sendHighscore(highscore);  // Writes new entry asynchronously to file
+        this.loadHighscores();
+        this.showHighscores();
       }
     }
   },
@@ -297,6 +345,17 @@ Universe.prototype =
     for (var i = 0; i < this.asteroids.length; ++i)
       this.asteroids[i].render();
 
+    // Show highscores
+    if (this.showhighscores == true)
+    {
+      var thistime = millis();
+      if (thistime - this.lasttime > 5000)
+      {
+        this.loadHighscores();
+        this.lasttime = thistime;
+      }
+    }
+
     // Render Objects, Projectiles and Ship only if state.PLAYING or state.PAUSED
     if (this.state == state.PLAYING || this.state == state.PAUSED)
     {
@@ -307,7 +366,6 @@ Universe.prototype =
           this.projectiles[i].render();
 
       this.ship.render();
-
 
       push();
 
@@ -328,12 +386,14 @@ Universe.prototype =
       // Show Help Text
       textAlign(CENTER, CENTER);
       textSize(15);
-      text("[r] New Game    [p] Pause Game    [n] Cycle Weapon    [Arrows] Move Ship    [Space] Fire Weapon",
+      text("[r] New Game    [p] Pause Game / Show Highscore    [n] Cycle Weapon    [Arrows] Move Ship    [Space] Fire Weapon",
       width/2, height-20);
 
       pop();
       if (this.state == state.PAUSED)
       {
+       this.renderHighscores();
+
        // Show Paused Message
        push();
        textFont("Courier");
@@ -354,6 +414,8 @@ Universe.prototype =
      }
     } else if (this.state == state.LOST)
     {
+      this.renderHighscores();
+
       // Show GameOver Message
       push();
       textFont("Courier");

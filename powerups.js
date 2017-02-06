@@ -17,7 +17,8 @@ function PointsPowerup(p, v, h)
                shape,
                10,
    /*TTL*/     50,
-               changes);
+               changes,
+  /*Duration*/ 0);
 }
 
 PointsPowerup.prototype = Object.create(Powerup.prototype);
@@ -42,7 +43,8 @@ function ShieldPowerup(p, v, h)
                shape,
                10,
    /*TTL*/     150,
-               changes);
+               changes,
+  /*Duration*/ 0);
 }
 
 ShieldPowerup.prototype = Object.create(Powerup.prototype);
@@ -68,7 +70,8 @@ function LaserPowerup(p, v, h)
                shape,
                10,
    /*TTL*/     150,
-               changes);
+               changes,
+  /*Duration*/ 0);
 }
 
 LaserPowerup.prototype = Object.create(Powerup.prototype);

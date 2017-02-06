@@ -67,11 +67,11 @@ function getCookie(name)
   if (parts.length == 2) return parts.pop().split(";").shift();
 }
 
-function loadJSON(filename, callback)
+function loadJSON(url, callback)
 {
   var xobj = new XMLHttpRequest();
   xobj.overrideMimeType("application/json");
-  xobj.open('GET', filename, true);
+  xobj.open('GET', url, true);
 
   xobj.onreadystatechange = function ()
   {
