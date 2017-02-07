@@ -37,7 +37,7 @@ function ShieldPowerup(p, v, h)
     // Set Shield to 100%
     { obj: "ship", property: "shield", type: "set", value: 100, duration: 0 },
     // Double Shield Refill for 500frames
-    { obj: "ship", property: "shield_refill", type: "mul", value: 2, duration: 500 },
+    { obj: "ship", property: "shield_refill", type: "mul", value: 2, duration: 200 },
   ];
 
   Powerup.call(this,

@@ -67,22 +67,17 @@ function getCookie(name)
   if (parts.length == 2) return parts.pop().split(";").shift();
 }
 
-function loadJSON(url, callback)
+function guid()
 {
-  var xobj = new XMLHttpRequest();
-  xobj.overrideMimeType("application/json");
-  xobj.open('GET', url, true);
-
-  xobj.onreadystatechange = function ()
+  function s4()
   {
-        if (xobj.readyState == 4 && xobj.status == "200")
-        {
-          // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-          callback(xobj.responseText);
-        }
-  };
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
 
-  xobj.send(null);
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
 }
 
 function getMatches(str, regex)

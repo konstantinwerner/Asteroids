@@ -2,6 +2,8 @@ function Universe()
 {
   this.version = "v3.0";
 
+  this.guid = undefined;
+
   // The Players Ship
   this.ship = {};
   // Array of other Objects (PowerUps, Ammo, etc.)
@@ -23,21 +25,19 @@ function Universe()
   this.state = state.INITALIZING;
 
   // Highscores
-  this.highscores = undefined;
-  this.highscoresLoaded = false;
-  this.highscoresVisible = false;
-  this.lasttime = millis();
+  this.highscore = new Highscore();
 }
 
 Universe.prototype =
 {
   create: function()
   {
-    this.hideHighscores();
+    this.highscore.hide();
     document.title = "Asteroids " + this.version;
 
     var s = state.INITALIZING;
     var pilotName = getCookie("asteroids_pilotName");
+    this.guid = getCookie("asteroids_guid");
 
     if (pilotName == "" || pilotName == undefined)
     {
@@ -62,107 +62,19 @@ Universe.prototype =
   setPilotName: function()
   {
     var name = select("#pilotName").elt.value;
-    document.cookie = "asteroids_pilotName=" + name + "";
+
+    // Build the expiration date string
+    var expiration_date = new Date();
+    expiration_date.setFullYear(expiration_date.getFullYear() + 1);
+
+    document.cookie = "asteroids_pilotName=" + name + "; path=/; expires=" + expiration_date.toUTCString();
+    document.cookie = "asteroids_guid=" + guid() + "; path=/; expires=" + expiration_date.toUTCString();
 
     this.ship.setPilotName(name);
 
     select("#nameInput").elt.style.visibility = "hidden";
 
     this.state = state.PLAYING;
-  },
-
-  sendHighscore: function(newHighscore)
-  {
-    var highscoreString = JSON.stringify(newHighscore);
-    var data = new FormData();
-    data.append("highscore", highscoreString);
-
-    var xhr = (window.XMLHttpRequest) ? new XMLHttpRequest() : new activeXObject("Microsoft.XMLHTTP");
-    xhr.open('post', 'highscore.php', true);
-    xhr.send(data);
-  },
-
-  loadHighscores: function()
-  {
-    this.highscoresLoaded = false;
-
-    // Add Timestamp to bypass caching
-    url = "highscore.json?timestamp=" + (new Date()).getTime();
-
-    loadJSON(url, function(data)
-    {
-      this.universe.highscores = data;
-      this.universe.highscoresLoaded = true;
-    });
-  },
-
-  renderHighscores: function()
-  {
-    if (this.highscoresLoaded == true &&
-        this.highscores != undefined)
-    {
-      var count = select("#gameCount");
-      count.elt.innerHTML = this.highscores.games_played + " Games played";
-
-      var scores = this.highscores.scores;
-      var table = select("#highscoreTable");
-      var body = table.elt.tBodies[0];
-
-      body.innerHTML = "";
-
-      var done = false;
-
-      for (var h = 0; h < scores.length && h < 10;)
-      {
-        // Show current score in list
-        if (!done &&
-           this.state == state.PAUSED &&
-           this.ship.score > scores[h].score)
-        {
-          body.innerHTML += "<tr class='indicator'>" +
-                            "<td class='indicator'>&gt;</td>" +
-                            "<td>" + this.ship.pilot + "</td>" +
-                            "<td>" + this.ship.score + "</td>" +
-                            "<td>" + this.ship.projectilesFired + "</td>" +
-                            "<td>" + this.ship.asteroidsDestroyed + "</td>";
-
-            done = true;
-        } else {
-          body.innerHTML += "<tr><td></td>" +
-                            "<td>" + scores[h].name + "</td>" +
-                            "<td>" + scores[h].score + "</td>" +
-                            "<td>" + scores[h].shots + "</td>" +
-                            "<td>" + scores[h].hits + "</td>";
-
-          ++h;
-        }
-      }
-
-      if (!done && this.state == state.PAUSED)
-      {
-        body.innerHTML += "<tr class='indicator'>" +
-                          "<td class='indicator'>&gt;</td>" +
-                          "<td>" + this.ship.pilot + "</td>" +
-                          "<td>" + this.ship.score + "</td>" +
-                          "<td>" + this.ship.projectilesFired + "</td>" +
-                          "<td>" + this.ship.asteroidsDestroyed + "</td>";
-      }
-    }
-  },
-
-  showHighscores: function()
-  {
-    this.lasttime = millis();
-    this.loadHighscores();
-
-    this.showhighscores = true;
-    select("#highscore").elt.style.visibility = "visible";
-  },
-
-  hideHighscores: function()
-  {
-    this.showhighscores = false;
-    select("#highscore").elt.style.visibility = "hidden";
   },
 
   keyPressed: function(key)
@@ -203,13 +115,13 @@ Universe.prototype =
     {
       this.state = state.PAUSED;
       document.title = "Asteroids " + this.version + " [PAUSED]";
-      this.showHighscores();
+      this.highscore.show();
     }
     else if (this.state == state.PAUSED)
     {
       this.state = state.PLAYING;
       document.title = "Asteroids " + this.version;
-      this.hideHighscores();
+      this.highscore.hide();
     }
   },
 
@@ -287,15 +199,19 @@ Universe.prototype =
           this.state == state.LOST)
       {
         var highscore = {
+          guid: this.guid,
+          timestamp: (new Date()).getTime(),
           name: this.ship.pilot,
           score: this.ship.score,
           hits: this.ship.asteroidsDestroyed,
-          shots: this.ship.projectilesFired
+          shots: this.ship.projectilesFired,
+          duration: this.ship.timeSurvived(),
+          frames: this.ship.age
         };
 
-        this.sendHighscore(highscore);  // Writes new entry asynchronously to file
-        this.loadHighscores();
-        this.showHighscores();
+        this.highscore.send(highscore);  // Writes new entry asynchronously to file
+        this.highscore.load();
+        this.highscore.show();
       }
     }
   },
@@ -346,15 +262,7 @@ Universe.prototype =
       this.asteroids[i].render();
 
     // Show highscores
-    if (this.showhighscores == true)
-    {
-      var thistime = millis();
-      if (thistime - this.lasttime > 5000)
-      {
-        this.loadHighscores();
-        this.lasttime = thistime;
-      }
-    }
+    this.highscore.render();
 
     // Render Objects, Projectiles and Ship only if state.PLAYING or state.PAUSED
     if (this.state == state.PLAYING || this.state == state.PAUSED)
@@ -392,8 +300,6 @@ Universe.prototype =
       pop();
       if (this.state == state.PAUSED)
       {
-       this.renderHighscores();
-
        // Show Paused Message
        push();
        textFont("Courier");
@@ -414,8 +320,6 @@ Universe.prototype =
      }
     } else if (this.state == state.LOST)
     {
-      this.renderHighscores();
-
       // Show GameOver Message
       push();
       textFont("Courier");

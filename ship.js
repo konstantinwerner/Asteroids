@@ -1,10 +1,11 @@
 function Ship(name)
 {
   this.pilot = name;
+
   this.score = 0;
+  this.startTime = millis();
   this.asteroidsDestroyed = 0;
   this.projectilesFired = 0;
-  this.timeSurvived = 0;
 
   // Size and Mass
   this.mass = 100;
@@ -138,6 +139,11 @@ Ship.prototype =
   {
     this.shield -= size / 100;
     this.isHit = true;
+  },
+
+  timeSurvived: function()
+  {
+    return (millis() - this.startTime);
   },
 
   update: function()
