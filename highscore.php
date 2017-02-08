@@ -21,9 +21,9 @@ function cmp($a, $b)
 
 $success = false;
 // Check if data available in cache
-if (apc_exists('highscore'))
+if (apcu_exists('highscore'))
 {
-  $data = apc_fetch('highscore', $success);
+  $data = apcu_fetch('highscore', $success);
 }
 
 if (!$success || ($_GET['get'] == "refresh"))
@@ -33,7 +33,7 @@ if (!$success || ($_GET['get'] == "refresh"))
   // Decode to JSON Object
   $data = json_decode($file_text, true);
   // Store in Caches
-  apc_store('highscore', $data);
+  apcu_store('highscore', $data);
 }
 
 // Set new highscore
@@ -43,6 +43,33 @@ if(!empty($_POST['highscore']))
 
   if ($newScore[0] != NULL)
   {
+    // Check JSON for illegal fields
+    foreach ($newScore[0] as $key => $field)
+    {
+      if (strlen($field) > 36)
+      {
+        header('HTTP/1.0 403 Forbidden', true, 403);
+        exit("Thou shalt not cheat!");
+      }
+
+      switch ($key)
+      {
+        case "guid":
+        case "timestamp":
+        case "name":
+        case "score":
+        case "hits":
+        case "shots":
+        case "duration":
+        case "frames":
+        break;
+        default:
+          header('HTTP/1.0 403 Forbidden', true, 403);
+          exit("Thou shalt not cheat!");
+        break;
+      }
+    }
+
     // Count played games
     if (isset($data["games_played"]))
     {
@@ -52,6 +79,8 @@ if(!empty($_POST['highscore']))
       $data["games_played"] = 1;
     }
 
+    $inserted = false;
+
     // Walk through existing scores
     for ($i = 0; $i < count($data['scores']); $i++)
     {
@@ -60,9 +89,14 @@ if(!empty($_POST['highscore']))
       {
         // Insert it above the p-th
         array_splice($data['scores'], $i, 0, $newScore);
+        $inserted = true;
         break;
       }
     }
+
+    // Lower than all other scores -> push at the end
+    if (!$inserted)
+    array_push($data['scores'], $newScore[0]);
 
     // Add new highscore to the list
 //    array_push($data['scores'], $newScore);
@@ -75,7 +109,7 @@ if(!empty($_POST['highscore']))
       $data['scores'] = array_slice($data['scores'], 0, 100);
 
     // Store new data in cache
-    apc_store('highscore', $data);
+    apcu_store('highscore', $data);
 
     // ...and store it in file, too
     $file = fopen(getcwd() . "/highscore.json", "w");

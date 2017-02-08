@@ -2,10 +2,13 @@ function Universe()
 {
   this.version = "v3.0";
 
-  this.guid = undefined;
+  // Get or generate GUID
+  this.guid = getCookie("asteroids_guid");
+  if (!this.guid)
+    this.guid = guid();
 
   // The Players Ship
-  this.ship = {};
+  this.ship = undefined;
   // Array of other Objects (PowerUps, Ammo, etc.)
   this.powerups = [];
   // Array of Moving Projectiles
@@ -17,6 +20,7 @@ function Universe()
   this.availablePowerUps = [
     { chance: 3, obj: ShieldPowerup },
     { chance: 3, obj: LaserPowerup },
+    { chance: 2, obj: PlasmaBombPowerup },
     { chance: 10, obj: PointsPowerup },
   ];
 
@@ -26,22 +30,23 @@ function Universe()
 
   // Highscores
   this.highscore = new Highscore();
+  this.highscoreSent = false;
 }
 
 Universe.prototype =
 {
   create: function()
   {
+    this.highscoreSent = false;
     this.highscore.hide();
     document.title = "Asteroids " + this.version;
 
     var s = state.INITALIZING;
     var pilotName = getCookie("asteroids_pilotName");
-    this.guid = getCookie("asteroids_guid");
 
     if (pilotName == "" || pilotName == undefined)
     {
-      select("#nameInput").elt.style.visibility = "";
+      select("#nameInput").elt.style.visibility = "visible";
     } else {
       s = state.PLAYING;
     }
@@ -52,29 +57,32 @@ Universe.prototype =
     this.asteroids = [];
 
     // Adjust number of Asteroids to Screenarea
-    var noOfAsteroids = width * height / 102000;
+    var noOfAsteroids = width * height / 120000;
     for (var a = 0; a < noOfAsteroids; ++a)
       this.asteroids.push(new Asteroid);
 
     this.state = s;
   },
 
-  setPilotName: function()
+  setPilotName: function(event)
   {
-    var name = select("#pilotName").elt.value;
+    if (event == undefined || event.keyCode === 13)
+    {
+      var name = select("#pilotName").elt.value;
 
-    // Build the expiration date string
-    var expiration_date = new Date();
-    expiration_date.setFullYear(expiration_date.getFullYear() + 1);
+      // Build the expiration date string
+      var expiration_date = new Date();
+      expiration_date.setFullYear(expiration_date.getFullYear() + 1);
 
-    document.cookie = "asteroids_pilotName=" + name + "; path=/; expires=" + expiration_date.toUTCString();
-    document.cookie = "asteroids_guid=" + guid() + "; path=/; expires=" + expiration_date.toUTCString();
+      document.cookie = "asteroids_pilotName=" + name + "; path=/; expires=" + expiration_date.toUTCString();
+      document.cookie = "asteroids_guid=" + this.guid + "; path=/; expires=" + expiration_date.toUTCString();
 
-    this.ship.setPilotName(name);
+      this.ship.setPilotName(name);
 
-    select("#nameInput").elt.style.visibility = "hidden";
+      select("#nameInput").elt.style.visibility = "hidden";
 
-    this.state = state.PLAYING;
+      this.state = state.PLAYING;
+    }
   },
 
   keyPressed: function(key)
@@ -189,35 +197,50 @@ Universe.prototype =
       }
 
       // Update Gamestate
-      if (this.asteroids.length == 0)
-        this.state = state.WON;
+      this.updateState();
+    }
+  },
 
-      if (this.ship.shield <= 0)
-        this.state = state.LOST;
+  updateState: function()
+  {
+    if (this.asteroids.length == 0)
+      this.state = state.WON;
 
-      if (this.state == state.WON ||
-          this.state == state.LOST)
-      {
-        var highscore = {
-          guid: this.guid,
-          timestamp: (new Date()).getTime(),
-          name: this.ship.pilot,
-          score: this.ship.score,
-          hits: this.ship.asteroidsDestroyed,
-          shots: this.ship.projectilesFired,
-          duration: this.ship.timeSurvived(),
-          frames: this.ship.age
-        };
+    if (this.ship.shield <= 0)
+      this.state = state.LOST;
 
-        this.highscore.send(highscore);  // Writes new entry asynchronously to file
-        this.highscore.load();
-        this.highscore.show();
-      }
+    if (!this.highscoreSent &&
+        (this.state == state.WON ||
+         this.state == state.LOST))
+    {
+      var highscore = {
+        guid: this.guid,
+        timestamp: (new Date()).getTime(),
+        name: this.ship.pilot,
+        score: this.ship.score,
+        hits: this.ship.asteroidsDestroyed,
+        shots: this.ship.projectilesFired,
+        duration: this.ship.timeSurvived(),
+        frames: this.ship.age
+      };
+
+      this.highscore.send(highscore);  // Writes new entry asynchronously to file
+      this.highscore.load();
+      this.highscore.show();
+
+      this.highscoreSent = true;
     }
   },
 
   update: function()
   {
+    // Handle keyDown
+    this.keyDown();
+
+    // Handle Collisions only if playing
+    if (this.state == state.PLAYING)
+      this.collide();
+
     // Update Asteroids if not state.PAUSED
     if (this.state != state.PAUSED && this.state != state.INITALIZING)
     {

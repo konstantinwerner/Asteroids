@@ -30,8 +30,6 @@ function draw()
 {
   background(0);
 
-  universe.keyDown();
-  universe.collide();
   universe.update();
   universe.render();
 }

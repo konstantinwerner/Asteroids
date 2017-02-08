@@ -116,3 +116,21 @@ function chance(probability)
   p = constrain(probability, 0, 1);
   return (p < random(0, 1));
 }
+
+function timespan(s)
+{
+  if (s > 0)
+  {
+    var mins = Math.floor(s / 60);
+
+    if (mins > 0)
+    {
+      s -= mins * 60;
+      return "" + mins + "m " + s + "s";
+    }
+    else
+      return "" + s + "s";
+  } else {
+    return "n/a";
+  }
+}

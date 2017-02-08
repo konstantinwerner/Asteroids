@@ -162,10 +162,10 @@ function PlasmaBomb()
   /*Auto Rate*/    0,
   /*MaxCharge*/    5,
   /*Charge*/       5,
-  /*Refill*/       0.002,
+  /*Refill*/       0.01,
   /*Shape*/        this.shape,
   /*Proj.Speed*/   0,
-  /*Proj.Inertia*/ 0.0,
+  /*Proj.Inertia*/ 0.5,
                    PlasmaBombProjectile);
 }
 PlasmaBomb.prototype = Object.create(Weapon.prototype);

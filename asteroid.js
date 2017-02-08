@@ -77,8 +77,8 @@ Asteroid.prototype =
         chunks.push(new Asteroid(this.pos.add(p_offset), v_offset.add(this.vel), f));
       }
     } else {
-      // Add new Asteroid off screen with a 25% chance
-      if (chance(0.25))
+      // Add new Asteroid off screen with a 20% chance
+      if (chance(0.20))
       {
         var p = createVector(random(width), -this.maxsize);
         chunks.push(new Asteroid(p));

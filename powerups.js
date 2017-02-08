@@ -9,7 +9,7 @@ function PointsPowerup(p, v, h)
 
   var changes = [
     // Add Extrapoints
-    { obj: "ship", property: "score", type: "add", value: (round(random(1,5))*5), duration: 0 }
+    { obj: "ship", property: "score", type: "add", value: (round(random(1,10))*5), duration: 0 }
   ];
 
   Powerup.call(this,
@@ -77,3 +77,30 @@ function LaserPowerup(p, v, h)
 }
 
 LaserPowerup.prototype = Object.create(Powerup.prototype);
+
+//------------------------------------------------------------------------------
+
+function PlasmaBombPowerup(p, v, h)
+{
+  var shape = [
+    {x: -5, y:  -5},
+    {x: +5, y:  -5},
+    {x: +5, y:  +5},
+    {x: -5, y:  +5}
+  ];
+
+  var changes = [
+    // Set Laser Charge to 100%
+    { obj: "ship.weapons[2]", property: "refill", type: "set", value: 0.1, duration: 200 }
+  ];
+
+  Powerup.call(this,
+               "PlasmaBomb",
+               p, v, h,
+               shape,
+               10,
+   /*TTL*/     100,
+               changes);
+}
+
+PlasmaBombPowerup.prototype = Object.create(Powerup.prototype);

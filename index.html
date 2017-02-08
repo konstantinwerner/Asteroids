@@ -24,7 +24,7 @@
   <div id="nameInput" style="visibility: hidden;">
     <p>Pilot, enter your name:</p>
     <p>
-      <input id="pilotName" type="text" name="pilotName"/>
+      <input id="pilotName" type="text" name="pilotName" maxlength="20" onkeypress="universe.setPilotName(event)"/>
     </p>
     <p>
       <button type="button" name="sendPilotName" onClick="universe.setPilotName()">Enter</button>
@@ -37,7 +37,7 @@
     <table id="highscoreTable">
       <thead>
       <tr>
-        <th></th><th>Name</th><th>Score</th><th>Shots</th><th>Hits</th>
+        <th>Name</th><th>Score</th><th>Shots / Hits</th><th>Time</th>
       </tr>
       </thead>
       <tbody>
