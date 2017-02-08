@@ -104,9 +104,9 @@ if(!empty($_POST['highscore']))
     // Sort the list
 //    usort($data['scores'], 'cmp');
 
-    // Truncate array to 100 entries
-    if (count($data['scores']) > 100)
-      $data['scores'] = array_slice($data['scores'], 0, 100);
+    // Truncate array to 500 entries
+    if (count($data['scores']) > 500)
+      $data['scores'] = array_slice($data['scores'], 0, 500);
 
     // Store new data in cache
     apcu_store('highscore', $data);
@@ -122,7 +122,17 @@ if(!empty($_POST['highscore']))
 if (($_GET['get'] == "highscore"))
 {
   header('Content-Type: application/json');
-  print_r(json_encode($data));
+
+  echo '{"scores":[';
+
+  for ($i = 0; $i < 9; $i++)
+  {
+    print_r(json_encode($data['scores'][$i]));
+    echo ",";
+  }
+  print_r(json_encode($data['scores'][9]));
+
+  echo '],"games_played":' . $data['games_played'] . '}';
 }
 
 ?>
