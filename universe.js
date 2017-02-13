@@ -124,8 +124,8 @@ Universe.prototype =
     {
       this.state = state.PAUSED;
       document.title = "Asteroids " + this.version + " [PAUSED]";
-      
-      if (!this.hostname.contains("github"))
+
+      if (!this.hostname.includes("github"))
         this.highscore.show();
     }
     else if (this.state == state.PAUSED)
@@ -216,7 +216,7 @@ Universe.prototype =
         (this.state == state.WON ||
          this.state == state.LOST))
     {
-      if (!this.hostname.contains("github"))
+      if (!this.hostname.includes("github"))
       {
         var highscore = {
           guid: this.guid,
