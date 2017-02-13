@@ -1,5 +1,6 @@
 function Universe()
 {
+  this.hostname = window.location.hostname;
   this.version = "v3.0";
 
   // Get or generate GUID
@@ -123,7 +124,9 @@ Universe.prototype =
     {
       this.state = state.PAUSED;
       document.title = "Asteroids " + this.version + " [PAUSED]";
-      this.highscore.show();
+      
+      if (!this.hostname.contains("github"))
+        this.highscore.show();
     }
     else if (this.state == state.PAUSED)
     {
@@ -213,20 +216,23 @@ Universe.prototype =
         (this.state == state.WON ||
          this.state == state.LOST))
     {
-      var highscore = {
-        guid: this.guid,
-        timestamp: (new Date()).getTime(),
-        name: this.ship.pilot,
-        score: this.ship.score,
-        hits: this.ship.asteroidsDestroyed,
-        shots: this.ship.projectilesFired,
-        duration: this.ship.timeSurvived(),
-        frames: this.ship.age
-      };
+      if (!this.hostname.contains("github"))
+      {
+        var highscore = {
+          guid: this.guid,
+          timestamp: (new Date()).getTime(),
+          name: this.ship.pilot,
+          score: this.ship.score,
+          hits: this.ship.asteroidsDestroyed,
+          shots: this.ship.projectilesFired,
+          duration: this.ship.timeSurvived(),
+          frames: this.ship.age
+        };
 
       this.highscore.send(highscore);  // Writes new entry asynchronously to file
-      this.highscore.load();
-      this.highscore.show();
+        this.highscore.load();
+        this.highscore.show();
+      }
 
       this.highscoreSent = true;
     }
