@@ -107,12 +107,12 @@ Highscore.prototype =
 
           for (var h = 0; h < scores.length && h < 10; ++h)
           {
-            var ratio = round(scores[h].shots / scores[h].hits * 100) / 100.0;
+            var ratio = round(scores[h].hits / scores[h].shots * 100) / 100.0;
 
             body.innerHTML += "<tr>" +
                               "<td>" + scores[h].name + "</td>" +
                               "<td>" + scores[h].score + "</td>" +
-                              "<td>" + scores[h].shots + "/" + scores[h].hits + " = " + ratio.toFixed(2) + "</td>" +
+                              "<td>" + scores[h].hits + "/" + scores[h].shots + " = " + ratio.toFixed(2) + "</td>" +
                               "<td>" + timespan( round(scores[h].frames/25)) + "</td>";
           }
         }

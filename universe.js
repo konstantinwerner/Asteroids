@@ -173,15 +173,15 @@ Universe.prototype =
         // Projectile-Asteroid Collisions
         for (var p = this.projectiles.length-1; p >= 0; --p)
         {
-          if (!this.projectiles[p].hasHit &&
-              this.asteroids[a].isHitBy(this.projectiles[p].pos))
+          if (!this.projectiles[p].isDecayed() &&
+              this.asteroids[a].isHitBy(this.projectiles[p].pos, this.projectiles[p].radius))
           {
             // Get new Asteroids from the destroyed one
             this.asteroids = this.asteroids.
                             concat(this.asteroids[a].breakup(this.projectiles[p].power));
 
-            // Set hasHit to render hit effect
-            this.projectiles[p].hasHit = true;
+            // Projectile Hit
+            this.projectiles[p].hit();
 
             // Increase Score
             this.ship.score += floor(this.asteroids[a].maxsize / this.asteroids[a].size * 10);

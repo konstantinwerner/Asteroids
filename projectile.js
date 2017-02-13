@@ -1,10 +1,13 @@
-function Projectile(p, v, h, shape, power, ttl, flyAnimation, hitAnimation)
+function Projectile(p, v, h, shape, power, ttl,
+                    flyAnimation, hitAnimation)
 {
   this.shape = shape;
 
   this.pos = createVector(p.x, p.y);
   this.vel = createVector(v.x, v.y);
   this.heading = h;
+
+  this.radius = 0;
 
   this.ttl = ttl;
   this.power = power;
@@ -13,9 +16,8 @@ function Projectile(p, v, h, shape, power, ttl, flyAnimation, hitAnimation)
   this.flyAnimation = flyAnimation;
   this.hitAnimation = hitAnimation;
 
-  this.hitFrame = 0;
-  this.hasHit = false;
-  this.hitEnd = false;
+  phase = { FLYING: 0, HIT: 1, DECAYED: 2 };
+  this.phase = phase.FLYING;
 }
 
 Projectile.prototype =
@@ -43,29 +45,29 @@ Projectile.prototype =
       endShape(CLOSE);
     }
   },
-/*
-  getCopy: function(p, v, h)
-  {
-    return new Projectile(p, v, h,
-                          this.shape,
-                          this.power,
-                          this.ttl,
-                          this.flyAnimation,
-                          this.hitAnimation);
-  },
-*/
+
   isDecayed: function()
   {
-    return ((this.age > this.ttl) || (this.hitEnd));
+    return (this.phase == phase.DECAYED);
+  },
+
+  hit: function()
+  {
+    if (this.phase == phase.FLYING)
+    {
+      this.age = 0;
+      this.phase = phase.HIT;
+    }
   },
 
   update: function()
   {
-    if (this.hasHit)
+    this.age++;
+
+    if (this.phase == phase.FLYING)
     {
-        this.hitFrame++;
-    } else {
-      this.age++;
+      if (this.age > this.ttl)
+        this.phase = phase.DECAYED;
 
       // Move
       this.pos.add(this.vel);
@@ -85,19 +87,21 @@ Projectile.prototype =
 
   render: function()
   {
-    if (this.age < this.ttl)
+    if (this.phase != phase.DECAYED)
     {
       push();
 
       translate(this.pos.x, this.pos.y);
       rotate(this.heading * PI / 180);
 
-      if (this.hasHit)
+      if (this.phase == phase.HIT)
       {
         if (this.hitAnimation != undefined)
-          this.hitEnd = this.hitAnimation(this.hitFrame);
-        else
-          this.hitEnd = this.defaultHitAnimation();
+        {
+          this.hitAnimation();
+        } else {
+          this.phase = phase.DECAYED;
+        }
       } else {
         if (this.flyAnimation != undefined)
           this.flyAnimation();

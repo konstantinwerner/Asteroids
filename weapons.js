@@ -61,26 +61,27 @@ function ProtonGunProjectile(p, v, h)
 
   };
 
-  var hitAnimation = function(frame)
+  var hitAnimation = function()
   {
     noFill();
     stroke(255);
     strokeWeight(1);
-    scale(frame / 2);
-    rotate(frame/5 * TWO_PI + this.heading * PI / 180);
+    scale(this.age / 2);
+    rotate(this.age/5 * TWO_PI + this.heading * PI / 180);
 
     beginShape();
     for (var i = 0; i < this.shape.length; ++i)
       vertex(this.shape[i].x, this.shape[i].y);
     endShape(CLOSE);
 
-    return (frame == 5);
+    if (this.age == 5)
+      this.phase = phase.DECAYED;
   };
 
   Projectile.call(this,
                   p, v, h,
                   shape,
- /*Power*/        3,
+ /*Power*/        2,
  /*TTL*/          60,
                   undefined,
                   hitAnimation);
@@ -130,22 +131,26 @@ function PlasmaBombProjectile(p, v, h)
 
   };
 
-  var hitAnimation = function(frame)
+  var hitAnimation = function()
   {
     noFill();
     stroke(255);
     strokeWeight(2);
-    ellipse(0, 0, 8*frame);
-    ellipse(0, 0, 2*frame);
-    ellipse(0, 0, frame*frame);
+    ellipse(0, 0, 8*this.age);
+    ellipse(0, 0, 2*this.age);
+    ellipse(0, 0, this.age*this.age / 2);
 
-    return (frame == 6);
+    this.radius = this.age*this.age / 2;
+    this.power /= 1.25;
+
+    if (this.age == 16)
+      this.phase = phase.DECAYED;
   };
 
   Projectile.call(this,
                   p, v, h,
                   shape,
- /*Power*/        5,
+ /*Power*/        4,
  /*TTL*/          200,
                   undefined,
                   hitAnimation);

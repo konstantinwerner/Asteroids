@@ -9,6 +9,7 @@ function Weapon(name, auto_rate, maxcharge, charge, refill, shape,
   this.maxcharge = maxcharge;
   this.charge = charge;
   this.refill = refill;
+  this.refillCounter = 0;
 
   this.shape = shape;
   this.gauge = new Gauge(name, width-100, height-100, 80, 0, this.maxcharge);
@@ -22,7 +23,7 @@ Weapon.prototype =
 {
   fire: function(p, v, h)
   {
-    if (this.charge > 0)
+    if (this.charge >= 1)
     {
       var vel = p5.Vector.fromAngle(h * PI / 180);
       vel = vel.mult(this.projectile_speed);
@@ -40,8 +41,19 @@ Weapon.prototype =
 
   update: function()
   {
-    if (this.charge < this.maxcharge )
-      this.charge += this.refill;
+    if (this.charge < this.maxcharge)
+    {
+/*      this.refillCounter++;
+
+      if (this.refillCounter * this.refill >= 1)
+      {
+          this.charge++;
+          this.refillCounter = 0;
+      }
+    }
+*/
+    this.charge += this.refill;
+    }
   },
 
   render: function()

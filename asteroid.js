@@ -42,13 +42,12 @@ Asteroid.prototype =
     }
   },
 
-  isHitBy: function(pos)
+  isHitBy: function(pos, radius)
   {
-    return collidePointPoly(pos.x - this.pos.x, pos.y - this.pos.y, this.vertex);
-/*
-    var d = dist(pos.x, pos.y, this.pos.x, this.pos.y);
-    return (d < this.size);
-*/
+    if (radius)
+      return collideCirclePoly(pos.x - this.pos.x, pos.y - this.pos.y, radius, this.vertex);
+    else
+      return collidePointPoly(pos.x - this.pos.x, pos.y - this.pos.y, this.vertex);
   },
 
   breakup: function(power)
@@ -56,7 +55,7 @@ Asteroid.prototype =
     var chunks = [];
 
     // If big enough to split up
-    if ((this.size / random(0.5, power)) > this.minsize)
+    if ((this.size / random(1, power)) > this.minsize)
     {
       var maxsplits = ceil(this.size / this.minsize);
       var splits = ceil(random(2, maxsplits));
